@@ -45,11 +45,11 @@ int main (int  argc, char ** argv )
 	int von, zu, gewicht;
 	for( i = 1; i <= anzahlKanten; i++ ) 
 	{
-
-
-		//1. KANTEN UND EINGANGSGRADE IN ENTSPRECHENDEN DATENSTRUKTUREN SPEICHERN
-
-
+		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
+		Kantengewicht[von][zu]= gewicht;
+		AdjMat[zu][0]++;
+		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
+		AdjMat[zu][AdjMat[zu][0]]=von;
 	}
 	fclose( file_Graph );
 	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
@@ -67,7 +67,7 @@ int main (int  argc, char ** argv )
 	{
 		if (i != startKnoten)
 		{
-			ShowShortestPath ( anzahlKnoten, AdjMat, startKnoten, i, Vorgaenger, WeglaengeZuKnoten );
+//			ShowShortestPath ( anzahlKnoten, AdjMat, startKnoten, i, Vorgaenger, WeglaengeZuKnoten );
 		}
 	}
 
@@ -91,15 +91,15 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 	int i, j;
 	int knoten;
 
-	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
+//	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 
 	int anzahlDerKnotenInTopSort = 0;
-	for ( i = 1; i <= anzahlKnoten; i++ )
-	{
-		if ( Eingangsgrad[ i ] == 0 )
-		{
-			anzahlDerKnotenInTopSort++;
-			TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;
+	while(anzahlDerKnotenInTopSort!=anzahlKnoten){
+		for ( i = 1; i <= anzahlKnoten; i++ ){
+			if ( Eingangsgrad[ i ] == 0 ){
+				anzahlDerKnotenInTopSort++;
+				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;		
+			}	
 		}
 	}
 	//ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
@@ -109,7 +109,7 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 	//2. TOP-SORT IMPLEMENTIEREN, ERGEBNIS SOLL IN VEKTOR TopologischeSortierung STEHEN 
 
 
-	if (KnotenMitEingangsgradNull != NULL) free ( KnotenMitEingangsgradNull );
+//	if (KnotenMitEingangsgradNull != NULL) free ( KnotenMitEingangsgradNull );
 	return 0;
 }
 
