@@ -17,6 +17,7 @@ int ShowShortestPath ( int anzahlKnoten, int ** AdjMat, int startKnoten, int zie
 //Definition der main-Funktion
 int main (int  argc, char ** argv )
 {
+	system("cls");
 	//Überprüfe Argumente
 	if ( 3 != argc ) 
 	{
@@ -45,7 +46,7 @@ int main (int  argc, char ** argv )
 	int von, zu, gewicht;
 	
 	
-/*	for( i = 1; i <= anzahlKanten; i++ ) 
+	for( i = 1; i <= anzahlKanten; i++ ) 
 	{
 		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
 		Kantengewicht[von][zu]= gewicht;
@@ -53,8 +54,9 @@ int main (int  argc, char ** argv )
 		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
 		AdjMat[zu][AdjMat[zu][0]]=von;
 	}
-*/	
+	
 	//alternativ	
+/*
 	for( i = 1; i <= anzahlKanten; i++ ) 
 	{
 		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
@@ -62,9 +64,9 @@ int main (int  argc, char ** argv )
 		Eingangsgrad[zu]++;
 		AdjMat[von][zu]=1;
 	}	
-	
+*/	
 	fclose( file_Graph );
-	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
+	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "Start AdjMat" );
 //	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
 //	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 	
@@ -100,24 +102,41 @@ int main (int  argc, char ** argv )
 
 int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsgrad, int * TopologischeSortierung )
 {
-	int i, j;
+	int i, j,z;
 	int knoten;
 
 	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 
 	int anzahlDerKnotenInTopSort = 0;
-	
-
+	while (anzahlDerKnotenInTopSort!=anzahlKnoten){
+		printf("\n\n**************Start *********\n\n");
+		knoten=0;
 		for ( i = 1; i <= anzahlKnoten; i++ ){
-			knoten=0;
 			if ( Eingangsgrad[ i ] == 0 ){
 				anzahlDerKnotenInTopSort++;
 				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;	
+				knoten=i;
 			}
 		}
+		for ( i = 1; i <= anzahlKnoten; i++ ){
+			for ( j = 1; j <= anzahlKnoten; j++ ){
+				if(knoten==AdjMat[i][j]){
+//				printf("k= %d i=%d j=%d Mat=%d\n",knoten, i,j,AdjMat[i][j]);
+				AdjMat[i][j]=0;
+				Eingangsgrad[knoten]=(-1);
+//				printf("Eingangsgraed Knoten %d =%d\n",j,Eingangsgrad[ i ]);
+				Eingangsgrad[ i ]--;
+//				printf("EinGrad neu=%d\n",Eingangsgrad[ j ]);
+				}
+			}
+		}
+		ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
+		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
+		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
+		printf("\n\n**************ENDE *********\n\n");
+	}
 
-
-	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
+	//ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
 	//ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
 	//ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 	//Break();
