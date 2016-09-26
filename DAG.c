@@ -8,6 +8,7 @@
 
 //Einbindung eigener, lokaler Bibliotheken
 #include "conv.h"
+#define MAX 100000 // Unendlich
 
 //Definition eigener Funktionen
 int TopSort(int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsgrad, int * TopologischeSortierung);
@@ -53,24 +54,13 @@ int main (int  argc, char ** argv )
 		AdjMat[zu][0]++;
 		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
 		AdjMat[zu][AdjMat[zu][0]]=von;
-	}
-	
-	//alternativ	
-/*
-	for( i = 1; i <= anzahlKanten; i++ ) 
-	{
-		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
-		Kantengewicht[von][zu]= gewicht;
-		Eingangsgrad[zu]++;
-		AdjMat[von][zu]=1;
 	}	
-*/	
 	fclose( file_Graph );
-	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "Start AdjMat" );
+//	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "Start AdjMat" );
 //	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
 //	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 	
-	//DAG
+//DAG
 	int startKnoten = atoi ( argv[ 2 ] );
 	int * WeglaengeZuKnoten = GenerateIntVect ( anzahlKnoten + 1 ); //entspricht Vektor C im Quellcode auf Vorlesungsfolien
 	int * Vorgaenger = GenerateIntVect ( anzahlKnoten+1 );	//entspricht Vektor v im Quellcode auf Vorlesungsfolien
@@ -100,55 +90,44 @@ int main (int  argc, char ** argv )
 	return 0; 
 }
 
+//2. TOP-SORT IMPLEMENTIEREN, ERGEBNIS SOLL IN VEKTOR TopologischeSortierung STEHEN
 int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsgrad, int * TopologischeSortierung )
 {
-	int i, j,z;
+	int i, j;
 	int knoten;
-
-	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 
 	int anzahlDerKnotenInTopSort = 0;
 	while (anzahlDerKnotenInTopSort!=anzahlKnoten){
-		printf("\n\n**************Start *********\n\n");
 		knoten=0;
 		for ( i = 1; i <= anzahlKnoten; i++ ){
 			if ( Eingangsgrad[ i ] == 0 ){
 				anzahlDerKnotenInTopSort++;
 				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;	
 				knoten=i;
+				break;
 			}
 		}
 		for ( i = 1; i <= anzahlKnoten; i++ ){
 			for ( j = 1; j <= anzahlKnoten; j++ ){
 				if(knoten==AdjMat[i][j]){
-//				printf("k= %d i=%d j=%d Mat=%d\n",knoten, i,j,AdjMat[i][j]);
 				AdjMat[i][j]=0;
 				Eingangsgrad[knoten]=(-1);
-//				printf("Eingangsgraed Knoten %d =%d\n",j,Eingangsgrad[ i ]);
 				Eingangsgrad[ i ]--;
-//				printf("EinGrad neu=%d\n",Eingangsgrad[ j ]);
 				}
 			}
 		}
-		ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
-		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
-		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-		printf("\n\n**************ENDE *********\n\n");
+//		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 	}
-
-	//ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
-	//ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
-	//ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-	//Break();
+//Break();
 
 
-	//2. TOP-SORT IMPLEMENTIEREN, ERGEBNIS SOLL IN VEKTOR TopologischeSortierung STEHEN 
+ 
 
 
 //	if (KnotenMitEingangsgradNull != NULL) free ( KnotenMitEingangsgradNull );
 	return 0;
 }
-
+//3. HIER DAG-ALGORITHMUS IMPLEMENTIEREN
 int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsgrad, int startKnoten, int zielKnoten, int * Vorgaenger, int * WeglaengeZuKnoten, int printDetails )
 {
 	int i, j, k;
@@ -157,13 +136,51 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 	TopologischeSortierung = GenerateIntVect ( anzahlKnoten+1 );
 
 	TopSort ( anzahlKnoten, AdjMat, Kantengewicht, Eingangsgrad, TopologischeSortierung );
+//	if (printDetails == 1) ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 
-	if (printDetails == 1) ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
+// setzte AdjMat unendlich
+	for(i=0;i<=anzahlKnoten;i++){
+		for(j=1;j<=anzahlKnoten;j++){
+			AdjMat[i][j]=MAX;	
+		}
+	}
+	AdjMat[startKnoten][startKnoten]=0;
+//ermittel Startposition und setzte in j
+	for(i=1;i<=anzahlKnoten;i++){
+		if (TopologischeSortierung[i]==startKnoten){
+								j=i; 
+		}
+	}
+		
+	for (j;j<=anzahlKnoten;j++)	{
+		printf("Position = %d\n",j);
+		k=TopologischeSortierung[j];
+		for(i=1;i<=anzahlKnoten;i++){
+			if(Kantengewicht[k][i]!=0 && AdjMat[k][i]==MAX){
+				AdjMat[k][i]=Kantengewicht[k][i];
+			}else if(Kantengewicht[k][i]!=0 && Kantengewicht[k][i]<AdjMat[k][i]){
+				AdjMat[k][i]=AdjMat[k][i]+Kantengewicht[k][i];
+			}
+		}
+		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
+		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
+		printf("\n\n********************\n\n");
+	}
 
-
-
-	//3. HIER DAG-ALGORITHMUS IMPLEMENTIEREN
-
+//kürzestenwege zum knoten.vorgänger in Zeile 0 Packen
+	for(i=1;i<=anzahlKnoten;i++){ //spalte
+		k=MAX;
+		for(j=1;j<=anzahlKnoten;j++){  //zeile
+			if(AdjMat[j][i]<MAX && AdjMat[j][i]<k){
+			AdjMat[0][i]=j;
+			k=AdjMat[j][i];
+			}
+				
+		}
+		
+	}
+	
+	ShowIntMat ( 0, anzahlKnoten, 1, anzahlKnoten, AdjMat, "ENDE" );
 
 
 	if (TopologischeSortierung != NULL) free ( TopologischeSortierung );
@@ -174,7 +191,7 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 
 int ShowShortestPath ( int anzahlKnoten, int ** AdjMat, int startKnoten, int zielKnoten, int * Vorgaenger, int * WeglaengeZuKnoten )
 {
-	if ( WeglaengeZuKnoten[ zielKnoten ] < 10000000 )
+	if ( WeglaengeZuKnoten[ zielKnoten ] < MAX )
 	{	
 		printf ( "\nKuerzester Weg von Startknoten %d zu Zielknoten %d mit Weglaenge %d:  ", startKnoten, zielKnoten, WeglaengeZuKnoten[ zielKnoten ] );
 		int vorg = zielKnoten;
