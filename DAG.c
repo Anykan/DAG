@@ -43,7 +43,9 @@ int main (int  argc, char ** argv )
 	int * Eingangsgrad = GenerateIntVect( anzahlKnoten+1 );
 
 	int von, zu, gewicht;
-	for( i = 1; i <= anzahlKanten; i++ ) 
+	
+	
+/*	for( i = 1; i <= anzahlKanten; i++ ) 
 	{
 		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
 		Kantengewicht[von][zu]= gewicht;
@@ -51,10 +53,20 @@ int main (int  argc, char ** argv )
 		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
 		AdjMat[zu][AdjMat[zu][0]]=von;
 	}
+*/	
+	//alternativ	
+	for( i = 1; i <= anzahlKanten; i++ ) 
+	{
+		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
+		Kantengewicht[von][zu]= gewicht;
+		Eingangsgrad[zu]++;
+		AdjMat[von][zu]=1;
+	}	
+	
 	fclose( file_Graph );
 	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
-	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
-	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
+//	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
+//	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 	
 	//DAG
 	int startKnoten = atoi ( argv[ 2 ] );
@@ -91,17 +103,22 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 	int i, j;
 	int knoten;
 
-//	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
+	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 
 	int anzahlDerKnotenInTopSort = 0;
-	while(anzahlDerKnotenInTopSort!=anzahlKnoten){
+	
+
 		for ( i = 1; i <= anzahlKnoten; i++ ){
+			knoten=0;
 			if ( Eingangsgrad[ i ] == 0 ){
 				anzahlDerKnotenInTopSort++;
-				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;		
-			}	
+				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;	
+			}
 		}
-	}
+
+
+	ShowIntVect ( 1, anzahlKnoten, Eingangsgrad, "Grad nacher" );
+	//ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
 	//ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 	//Break();
 
