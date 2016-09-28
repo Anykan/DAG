@@ -56,7 +56,7 @@ int main (int  argc, char ** argv )
 		AdjMat[zu][AdjMat[zu][0]]=von;
 	}	
 	fclose( file_Graph );
-//	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "Start AdjMat" );
+//	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "Vorgaenger" );
 //	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
 //	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 	
@@ -104,6 +104,7 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 				anzahlDerKnotenInTopSort++;
 				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;	
 				knoten=i;
+				printf("%d\n",i);
 				break;
 			}
 		}
@@ -118,13 +119,10 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 		}
 //		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 	}
+	ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
 //Break();
 
 
- 
-
-
-//	if (KnotenMitEingangsgradNull != NULL) free ( KnotenMitEingangsgradNull );
 	return 0;
 }
 //3. HIER DAG-ALGORITHMUS IMPLEMENTIEREN
@@ -153,7 +151,7 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 	}
 		
 	for (j;j<=anzahlKnoten;j++)	{
-		printf("Position = %d\n",j);
+//		printf("Position = %d\n",j);
 		k=TopologischeSortierung[j];
 		for(i=1;i<=anzahlKnoten;i++){
 			if(Kantengewicht[k][i]!=0 && AdjMat[k][i]==MAX){
@@ -162,9 +160,9 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 				AdjMat[k][i]=AdjMat[k][i]+Kantengewicht[k][i];
 			}
 		}
-		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
-		printf("\n\n********************\n\n");
+//		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
+//		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
+//		printf("\n\n********************\n\n");
 	}
 
 //kürzestenwege zum knoten.vorgänger in Zeile 0 Packen
@@ -180,7 +178,7 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 		
 	}
 	
-	ShowIntMat ( 0, anzahlKnoten, 1, anzahlKnoten, AdjMat, "ENDE" );
+//	ShowIntMat ( 0, anzahlKnoten, 1, anzahlKnoten, AdjMat, "ENDE" );
 
 
 	if (TopologischeSortierung != NULL) free ( TopologischeSortierung );
