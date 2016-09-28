@@ -51,9 +51,9 @@ int main (int  argc, char ** argv )
 	{
 		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
 		Kantengewicht[von][zu]= gewicht;
-		AdjMat[zu][0]++;
+		AdjMat[von][0]++;
 		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
-		AdjMat[zu][AdjMat[zu][0]]=von;
+		AdjMat[von][AdjMat[von][0]]=zu;
 	}	
 	fclose( file_Graph );
 //	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "Vorgaenger" );
@@ -71,7 +71,7 @@ int main (int  argc, char ** argv )
 	{
 		if (i != startKnoten)
 		{
-//			ShowShortestPath ( anzahlKnoten, AdjMat, startKnoten, i, Vorgaenger, WeglaengeZuKnoten );
+			ShowShortestPath ( anzahlKnoten, AdjMat, startKnoten, i, Vorgaenger, WeglaengeZuKnoten );
 		}
 	}
 
@@ -97,32 +97,27 @@ int TopSort ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Einga
 	int knoten;
 
 	int anzahlDerKnotenInTopSort = 0;
-	while (anzahlDerKnotenInTopSort!=anzahlKnoten){
+	do {
 		knoten=0;
 		for ( i = 1; i <= anzahlKnoten; i++ ){
 			if ( Eingangsgrad[ i ] == 0 ){
 				anzahlDerKnotenInTopSort++;
 				TopologischeSortierung[ anzahlDerKnotenInTopSort ] = i;	
 				knoten=i;
-				printf("%d\n",i);
 				break;
 			}
 		}
-		for ( i = 1; i <= anzahlKnoten; i++ ){
-			for ( j = 1; j <= anzahlKnoten; j++ ){
-				if(knoten==AdjMat[i][j]){
-				AdjMat[i][j]=0;
-				Eingangsgrad[knoten]=(-1);
-				Eingangsgrad[ i ]--;
-				}
-			}
+		if(knoten == 0){
+			system ("cls");
+			printf ("Netzwerk ist nicht Kreisfrei");
+			break;
 		}
-//		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-	}
-	ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-//Break();
-
-
+		for ( j = 1; j <= AdjMat[knoten][0]; j++ ){
+			Eingangsgrad[knoten]=(-1);
+			Eingangsgrad[ AdjMat[knoten][j] ]--;
+		}
+	}while (anzahlDerKnotenInTopSort<anzahlKnoten);
+	
 	return 0;
 }
 //3. HIER DAG-ALGORITHMUS IMPLEMENTIEREN
@@ -134,51 +129,33 @@ int DAG ( int anzahlKnoten, int ** AdjMat, int ** Kantengewicht, int * Eingangsg
 	TopologischeSortierung = GenerateIntVect ( anzahlKnoten+1 );
 
 	TopSort ( anzahlKnoten, AdjMat, Kantengewicht, Eingangsgrad, TopologischeSortierung );
-//	if (printDetails == 1) ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-
-// setzte AdjMat unendlich
-	for(i=0;i<=anzahlKnoten;i++){
-		for(j=1;j<=anzahlKnoten;j++){
-			AdjMat[i][j]=MAX;	
+//	ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );	
+	
+	for (j=1;j<=anzahlKnoten;j++){
+		WeglaengeZuKnoten[j]=MAX;
+		Vorgaenger[j]=MAX;
+		if(TopologischeSortierung[j]==startKnoten){
+			i=j;
 		}
 	}
-	AdjMat[startKnoten][startKnoten]=0;
-//ermittel Startposition und setzte in j
-	for(i=1;i<=anzahlKnoten;i++){
-		if (TopologischeSortierung[i]==startKnoten){
-								j=i; 
-		}
-	}
-		
-	for (j;j<=anzahlKnoten;j++)	{
-//		printf("Position = %d\n",j);
-		k=TopologischeSortierung[j];
-		for(i=1;i<=anzahlKnoten;i++){
-			if(Kantengewicht[k][i]!=0 && AdjMat[k][i]==MAX){
-				AdjMat[k][i]=Kantengewicht[k][i];
-			}else if(Kantengewicht[k][i]!=0 && Kantengewicht[k][i]<AdjMat[k][i]){
-				AdjMat[k][i]=AdjMat[k][i]+Kantengewicht[k][i];
+	WeglaengeZuKnoten[startKnoten]=0;
+	Vorgaenger[startKnoten]=0;
+	
+	for(i;i<=anzahlKnoten;i++){
+		if(WeglaengeZuKnoten[TopologischeSortierung[i]]<MAX){
+			for(k=1;k<=AdjMat[TopologischeSortierung[i]][0];k++){
+				j = AdjMat[TopologischeSortierung[i]][k];
+				if(WeglaengeZuKnoten[j]>WeglaengeZuKnoten[TopologischeSortierung[i]]+Kantengewicht[TopologischeSortierung[i]][j]){
+					WeglaengeZuKnoten[j]=WeglaengeZuKnoten[TopologischeSortierung[i]]+Kantengewicht[TopologischeSortierung[i]][j];
+					Vorgaenger[j]=TopologischeSortierung[i];
+				}
 			}
 		}
-//		ShowIntVect ( 1, anzahlKnoten, TopologischeSortierung, "TopologischeSortierung" );
-//		ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, AdjMat, "AdjMat" );
-//		printf("\n\n********************\n\n");
-	}
-
-//kürzestenwege zum knoten.vorgänger in Zeile 0 Packen
-	for(i=1;i<=anzahlKnoten;i++){ //spalte
-		k=MAX;
-		for(j=1;j<=anzahlKnoten;j++){  //zeile
-			if(AdjMat[j][i]<MAX && AdjMat[j][i]<k){
-			AdjMat[0][i]=j;
-			k=AdjMat[j][i];
-			}
-				
-		}
-		
 	}
 	
-//	ShowIntMat ( 0, anzahlKnoten, 1, anzahlKnoten, AdjMat, "ENDE" );
+//	ShowIntVect( 1, anzahlKnoten, Vorgaenger, "Vorgaenger" );
+//	ShowIntVect ( 1, anzahlKnoten, WeglaengeZuKnoten, "WeglaengeZuKnoten" );	
+//	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "AdjMat" );
 
 
 	if (TopologischeSortierung != NULL) free ( TopologischeSortierung );
