@@ -52,12 +52,12 @@ int main (int  argc, char ** argv )
 		fscanf( file_Graph, "%d %d %d", &von, &zu, &gewicht );
 		Kantengewicht[von][zu]= gewicht;
 		AdjMat[von][0]++;
-		Eingangsgrad[zu]++;  // Wozu eingangsgrad wenn spalte 0 dafür schon genutz wird ????
+		Eingangsgrad[zu]++;
 		AdjMat[von][AdjMat[von][0]]=zu;
 	}	
 	fclose( file_Graph );
 //	ShowIntMat ( 1, anzahlKnoten, 0, anzahlKnoten, AdjMat, "Vorgaenger" );
-//	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
+	ShowIntMat ( 1, anzahlKnoten, 1, anzahlKnoten, Kantengewicht, "Kantengewicht" );
 //	ShowIntVect( 1, anzahlKnoten, Eingangsgrad, "Eingangsgrad" );
 	
 //DAG
